@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Interstitial-er",
+  "description": "Real-time MP3 scheduler with recurring hourly, daily, and one-time events.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

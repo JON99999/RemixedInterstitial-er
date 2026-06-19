@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Centralized base border settings */
+  --grid-border-base: #000000;
+  --grid-border-active-opacity: 16%;   /* slate-300 equivalent */
+  --grid-border-inactive-opacity: 9%;   /* slightly lighter */
+
+  /* Base highlight colors */
+  --grid-border-onetime-color: #a855f7;  /* purple */
+  --grid-border-hourly-color: #3b82f6;   /* blue */
+  --grid-border-advanced-color: #f97316; /* orange */
+
+  /* Computations for standard borders */
+  --card-border-active: color-mix(in srgb, var(--grid-border-base) var(--grid-border-active-opacity), transparent);
+  --card-border-inactive: color-mix(in srgb, var(--grid-border-base) var(--grid-border-inactive-opacity), transparent);
+
+  /* Highlight borders mixed with default black shading */
+  --card-border-onetime: color-mix(in srgb, var(--grid-border-onetime-color) 40%, var(--grid-border-base) 15%);
+  --card-border-hourly: color-mix(in srgb, var(--grid-border-hourly-color) 40%, var(--grid-border-base) 15%);
+  --card-border-advanced: color-mix(in srgb, var(--grid-border-advanced-color) 40%, var(--grid-border-base) 15%);
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Custom borders standardized under a single theme namespace */
+  --color-grid-active: var(--card-border-active);
+  --color-grid-inactive: var(--card-border-inactive);
+  --color-grid-onetime: var(--card-border-onetime);
+  --color-grid-hourly: var(--card-border-hourly);
+  --color-grid-advanced: var(--card-border-advanced);
+}
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+  input, button, select, textarea {
+    font-family: inherit;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-from-top {
+  from { transform: translateY(-0.5rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.slide-in-from-top-2 {
+  animation: slide-in-from-top 0.3s ease-out;
+}
+
+@media (max-width: 340px) {
+  .hide-app-name {
+    display: none !important;
+  }
+}
+@media (max-width: 290px) {
+  .hide-log-name {
+    display: none !important;
+  }
+}
+@media (max-width: 250px) {
+  .hide-scheduler-name {
+    display: none !important;
+  }
+}
+@media (max-width: 310px) {
+  .hide-player-name {
+    display: none !important;
+  }
+}
+
+/* 1. First, remove "Folders" text and leave the folder icon */
+@media (max-width: 520px) {
+  .hide-folders-text {
+    display: none !important;
+  }
+}
+
+/* 2. Second, remove "Export" text and leave the export icon */
+@media (max-width: 460px) {
+  .hide-export-text {
+    display: none !important;
+  }
+}
+
+/* 3. Third, remove "Prerecord" text and leave the prerecord icon */
+@media (max-width: 400px) {
+  .hide-prerecord-text {
+    display: none !important;
+  }
+}
+
+/* 4. Fourth, remove "Live" text and leave the radio icon */
+@media (max-width: 340px) {
+  .hide-live-text {
+    display: none !important;
+  }
+}
+
+/* 5. Finally, remove the entire Demo object as a last resort */
+@media (max-width: 280px) {
+  .hide-demo-label {
+    display: none !important;
+  }
+}
+
+/* Ensure number input spinners (up/down icons) are always visible and not overlapping labels */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: inner-spin-button !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+input[type="number"] {
+  -moz-appearance: number-input !important;
+}
+
+/* Make calendar popup icon black in date inputs */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+
+
