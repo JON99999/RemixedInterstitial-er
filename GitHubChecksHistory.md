@@ -6,6 +6,19 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 20, 2026] Analysis of Run v0.1.3 Build Failure
+*   **Version Number Targeted**: `v0.1.3`
+*   **Source Log / Input URL**: Supplied directly in prompt.
+*   **Identified Issues**:
+    1. **Duplicate Main Method / Program Definition (CS0101, CS0111)**: Generating a custom `Platforms/Windows/Program.cs` file with a manual `Main` method resulted in a compilation conflict. The WinUI 3 XAML compiler automatically generates a `Program` with a `Main` method inside `App.g.i.cs`. Without telling MSBuild to bypass the auto-generator, this caused compilation warnings/errors like `Type 'Program' already defines a member called 'Main' with the same parameter types`.
+*   **Proposed Resolution Paths**:
+    1. **Configure DISABLE_XAML_GENERATED_MAIN**: Inject `<DefineConstants Condition="'$(TargetFramework)' != '' AND $(TargetFramework.Contains('-windows'))">$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>` into `maui/InterstitialerMaui.csproj` under the PropertyGroup. This prevents the WinUI compiler from generating an automatic entry point, thereby using our custom `Platforms/Windows/Program.cs` entry point correctly.
+*   **Status / Final Execution**: **Executed and Resolved in release v0.1.4**
+    *   Added the `DISABLE_XAML_GENERATED_MAIN` constant conditional to the Windows build target inside `/maui/InterstitialerMaui.csproj`.
+    *   Updated target version from `0.1.3` to `0.1.4` globally across all manifests and guides (`package.json`, `package-lock.json`, `InterstitialerMaui.csproj`, and `/HOW_TO_RELEASE_IN_GITHUB_ONLINE.md`).
+
+---
+
 ### [Date: June 19, 2026] Analysis of Run v0.1.2 Build Failure
 *   **Version Number Targeted**: `v0.1.2`
 *   **Source Log / Input URL**: Supplied directly in prompt.
