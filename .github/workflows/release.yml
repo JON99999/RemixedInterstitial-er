@@ -1,4 +1,4 @@
-name: Build/Release Electron App
+name: Build/Release .NET MAUI App
 
 on:
   push:

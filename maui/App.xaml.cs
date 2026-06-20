@@ -11,14 +11,11 @@ namespace InterstitialerMaui
         public App()
         {
             InitializeComponent();
-            MainPage = new MainPage();
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            var window = base.CreateWindow(activationState);
-            if (window == null) return new Window();
-
+            var window = new Window(new MainPage());
             string appMode = "Admin";
             try
             {
