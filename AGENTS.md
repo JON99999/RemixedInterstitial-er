@@ -1,6 +1,6 @@
 # Environment Guidelines
 
-This application is primarily a **Desktop Application** built with Electron and Express. 
+This application is primarily a **Desktop Application** built with .NET MAUI and Express. 
 
 ## Target Platforms (Priority)
 
@@ -15,15 +15,15 @@ This application is primarily a **Desktop Application** built with Electron and 
     - When 2 or 3 (Intel/Windows) cause performance Or binary size issues for 1 (Silicon), notify the user and ask for preference.
     - Avoid platform-specific paths unless handled by `path.join` or similar utilities.
     - Test interactions with localized file systems (e.g., standard library folders on Mac vs Windows).
-- **Backend**: The Express server (`server.ts`) is bundled into the desktop app. Always maintain the `dist/server.cjs` build pipeline for the Electron entry point.
+- **Backend**: The Express server (`server.ts`) is bundled into the desktop app. Always maintain the `dist/server.cjs` build pipeline for the .NET MAUI local backend / hosting environment.
 - **Native Modules**: Be cautious when adding dependencies with native code. Ensure they can be cross-compiled for `arm64` and `x64`.
 
 ## Build Configuration
 
-- Use `electron-builder` for distribution.
-- Configurations for all three priorities must be maintained in `package.json`.
-- Distribution should focus on `dmg` and `zip` for Mac, and `nsis` (installer) or `portable` for Windows.
-- **No Staging or Backup Workarounds for Mac packaging**: Under no circumstances should Mac builds be split into multiple sequential `electron-builder` invocations requiring backup files, manual file moving, or custom renaming/staging workarounds in `build-apps.cjs`. Always run a single unified compile invocation: `npx electron-builder --mac --x64 --arm64` to output both targets in one clean pass.
+- Use `.NET SDK` and MAUI workloads for distribution.
+- Configurations for MAUI target frameworks (`net10.0-maccatalyst` and `net10.0-windows10.0.19041.0`) are maintained in `maui/InterstitialerMaui.csproj`.
+- Distribution builds focus on `.dmg` or `.zip` on macOS, and `.exe` Installer (using Inno Setup) or `.zip` on Windows.
+- **Unified Build Invocation**: Both modern Admin and Player modules are packaged using the standard pipeline command: `npm run dist:maui`.
 - **GitHub Release-First Assumptions**: Always construct, refactor, and check code under the strict assumption that compilation and packaging occur on virtualized runners when building releases via the GitHub web interface. Ensure cross-platform build stability, explicit dependency typing, and robust bundler support to run seamlessly without interactive intervention.
 - **Preemptive Cross-Platform Validation**: Before finalizing changes, proactively double-check all packaging methods and script invocations for runner-specific hazards (e.g., case-sensitivity in relative imports, implicit paths, absent native compile chains, and OS differences) to eliminate repetitive build fail cycles on GitHub Actions.
 

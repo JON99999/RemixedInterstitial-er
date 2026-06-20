@@ -1,6 +1,6 @@
 {
-  "name": "Remix: Interstitial-er",
-  "description": "Real-time MP3 scheduler with recurring hourly, daily, and one-time events.",
+  "name": "Interstitial-er (.NET/MAUI)",
+  "description": "Cross-platform Desktop MP3 Scheduler built with .NET MAUI and Express, optimized for MacOS and Windows.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
