@@ -6,6 +6,19 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 20, 2026] Analysis of Run v0.1.4 Build Failure
+*   **Version Number Targeted**: `v0.1.4`
+*   **Source Log / Input URL**: Supplied directly in prompt. Refer to https://github.com/JON99999/Interstitial-er/actions for context.
+*   **Identified Issues**:
+    1. **Ambiguous Reference for Application Class in Windows Program Bootstrap (CS0104)**: In `maui/Platforms/Windows/Program.cs` at line 17, the term `Application` is ambiguous. Implicit global usings under the MAUI workload import `Microsoft.Maui.Controls`, which contains `Microsoft.Maui.Controls.Application`. Additionally, the file has `using Microsoft.UI.Xaml;`, which contains `Microsoft.UI.Xaml.Application`. This causes ambiguity when calling `Application.Start(...)`.
+*   **Proposed Resolution Paths**:
+    1. **Fully Qualify Application Reference**: Modify `Application.Start` in `maui/Platforms/Windows/Program.cs` to use its fully qualified name: `Microsoft.UI.Xaml.Application.Start`.
+*   **Status / Final Execution**: **Executed and Resolved in release v0.1.5**
+    *   Fully qualified `Application.Start` in `maui/Platforms/Windows/Program.cs` as `Microsoft.UI.Xaml.Application.Start` to resolve the class namespace ambiguity.
+    *   Updated target version from `0.1.4` to `0.1.5` globally across all manifests (`package.json`, `package-lock.json`, and `InterstitialerMaui.csproj`).
+
+---
+
 ### [Date: June 20, 2026] Analysis of Run v0.1.3 Build Failure
 *   **Version Number Targeted**: `v0.1.3`
 *   **Source Log / Input URL**: Supplied directly in prompt.
