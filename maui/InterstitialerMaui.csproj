@@ -17,7 +17,7 @@
     <!-- Display Name & App ID -->
     <ApplicationTitle>Interstitial-er</ApplicationTitle>
     <ApplicationId>com.interstitialer.scheduler.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.6</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.1.7</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('mac'))">13.1</SupportedOSPlatformVersion>
@@ -29,6 +29,11 @@
     
     <!-- Disable the WinUI XAML compiler auto-generated Program.Main to allow our custom Platforms/Windows/Program.cs -->
     <DefineConstants Condition="'$(TargetFramework)' != '' AND $(TargetFramework.Contains('-windows'))">$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+
+    <!-- Bypass Xcode version requirements so builds on CI/GitHub Actions runners with older/different Xcode version do not fail -->
+    <SuppressSdkDetection>true</SuppressSdkDetection>
+    <_SuppressSdkDetection>true</_SuppressSdkDetection>
+    <SkipXcodeValidation>true</SkipXcodeValidation>
   </PropertyGroup>
 
   <ItemGroup>

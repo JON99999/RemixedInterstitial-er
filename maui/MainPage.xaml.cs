@@ -34,7 +34,7 @@ namespace InterstitialerMaui
                 _server.Start();
 
                 // Point the WebView to our local listener URL
-                AppWebView.Source = $"http://localhost:{_serverPort}";
+                AppWebView.Source = $"http://127.0.0.1:{_serverPort}";
             }
             catch (Exception ex)
             {
