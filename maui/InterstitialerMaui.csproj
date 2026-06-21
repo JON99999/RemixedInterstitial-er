@@ -5,7 +5,8 @@
     <TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('windows'))">net10.0-maccatalyst</TargetFrameworks>
     <!-- On Windows, allow simple portable folder extraction and execution -->
     <WindowsPackageType Condition="$([MSBuild]::IsOSPlatform('windows'))">None</WindowsPackageType>
-    <OutputType>WinExe</OutputType>
+    <OutputType Condition="'$(TargetFramework)' != '' and $(TargetFramework.Contains('-windows'))">WinExe</OutputType>
+    <OutputType Condition="'$(TargetFramework)' == '' or !$(TargetFramework.Contains('-windows'))">Exe</OutputType>
     <RootNamespace>InterstitialerMaui</RootNamespace>
     <UseMaui>true</UseMaui>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
@@ -16,7 +17,7 @@
     <!-- Display Name & App ID -->
     <ApplicationTitle>Interstitial-er</ApplicationTitle>
     <ApplicationId>com.interstitialer.scheduler.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.5</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.1.6</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('mac'))">13.1</SupportedOSPlatformVersion>

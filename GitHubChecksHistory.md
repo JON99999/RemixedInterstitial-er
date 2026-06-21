@@ -6,6 +6,22 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 21, 2026] Analysis of Run v0.1.5 Build Failure
+*   **Version Number Targeted**: `v0.1.5`
+*   **Source Log / Input URL**: Supplied directly in prompt. Refer to https://github.com/JON99999/Interstitial-er/actions for context.
+*   **Identified Issues**:
+    1. **MacCatalyst Invalid OutputType Error (WinExe)**: The compiler for `TargetFramework=net10.0-maccatalyst` failed with: `error : WinExe is not a valid output type for MacCatalyst`. The `<OutputType>` element in `maui/InterstitialerMaui.csproj` is currently globally set to `WinExe`, which is only valid on Windows.
+*   **Proposed Resolution Paths**:
+    1. **Conditionally Define OutputType**: Define `<OutputType>` conditionally in `maui/InterstitialerMaui.csproj`:
+       * Set `<OutputType Condition="'$(TargetFramework)' != '' AND !$(TargetFramework.Contains('-windows'))">Exe</OutputType>`
+       * Set `<OutputType Condition="'$(TargetFramework)' != '' AND $(TargetFramework.Contains('-windows'))">WinExe</OutputType>`
+       * Set `<OutputType Condition="'$(TargetFramework)' == ''">Exe</OutputType>`
+*   **Status / Final Execution**: **Executed and Resolved in release v0.1.6**
+    *   Updated `<OutputType>` in `maui/InterstitialerMaui.csproj` to be conditional, using `WinExe` only for Windows targets and `Exe` for MacCatalyst and empty-target fallbacks.
+    *   Updated target version from `0.1.5` to `0.1.6` globally across all manifests (`package.json`, `package-lock.json`, and `InterstitialerMaui.csproj`).
+
+---
+
 ### [Date: June 20, 2026] Analysis of Run v0.1.4 Build Failure
 *   **Version Number Targeted**: `v0.1.4`
 *   **Source Log / Input URL**: Supplied directly in prompt. Refer to https://github.com/JON99999/Interstitial-er/actions for context.
