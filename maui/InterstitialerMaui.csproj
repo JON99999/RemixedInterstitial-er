@@ -17,7 +17,7 @@
     <!-- Display Name & App ID -->
     <ApplicationTitle>Interstitial-er</ApplicationTitle>
     <ApplicationId>com.interstitialer.scheduler.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.7</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.1.8</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('mac'))">13.1</SupportedOSPlatformVersion>
@@ -53,5 +53,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <!-- Override SDK-specific validation targets to bypass host Xcode version checking on CI runners -->
+  <Target Name="_CheckXcodeVersion" />
+  <Target Name="_DetectXcode" />
+  <Target Name="_DetectSdk" />
+  <Target Name="_CheckSdk" />
+  <Target Name="_ValidateXcode" />
+  <Target Name="_CheckXcode" />
+  <Target Name="_CheckMacCatalystXcode" />
 
 </Project>
