@@ -6,6 +6,17 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 22, 2026] Global Target Mismatch Remediation & Version Realignment for v0.1.11
+*   **Version Number Targeted**: `v0.1.11`
+*   **Source Log / Input URL**: Supplied directly in prompt (GHA runner logs showing error `NETSDK1045: The current .NET SDK does not support targeting .NET 10.0`).
+*   **Identified Issues**:
+    1. **Target Framework Out-of-Sync in Build Script**: Although `/maui/InterstitialerMaui.csproj` was successfully trimmed to use stable `.NET 9` targets, the orchestration script `/build-maui.cjs` was still invoking `dotnet publish` with hardcoded `-f net10.0-windows10.0.19041.0` and `-f net10.0-maccatalyst` arguments on GHA runners. Because the virtual environment was restricted to setup-dotnet `9.0.x` via `global.json`, compiling for target `.NET 10` failed immediately with an incompatible SDK inference policy.
+*   **Approved Execution**:
+    1. **Synchronized Orchestration Target Frameworks**: Switched build targets inside `/build-maui.cjs` to target `net9.0-windows10.0.19041.0` for Windows platforms and `net9.0-maccatalyst` for macOS platforms.
+    2. **Synchronized Project Design Directives**: Aligned the primary architectural document `/AGENTS.md` to reference `.NET 9` target frameworks to maintain persistent system expectations.
+    3. **Global Version Alignment**: Promoted product version from `0.1.10` to `0.1.11` globally inside `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Executed, checked, and completely aligned in release v0.1.11.**
+
 ### [Date: June 22, 2026] Analysis of MacCatalyst Xcode Version Mismatch Build Failure in v0.1.9
 *   **Version Number Targeted**: `v0.1.9`
 *   **Source Log / Input URL**: Supplied directly in prompt (logs from version v0.1.9 run). Refer to https://github.com/JON99999/Interstitial-er/actions for context.

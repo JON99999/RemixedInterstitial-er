@@ -46,11 +46,11 @@ function buildMauiApp(mode) {
   let platformPublishArgs = '';
 
   if (process.platform === 'win32') {
-    targetFramework = 'net10.0-windows10.0.19041.0';
+    targetFramework = 'net9.0-windows10.0.19041.0';
     // On Windows, publish as a completely self-contained deployment bundled with .NET runtime
     platformPublishArgs = `-p:WindowsPackageType=None -p:SelfContained=true -p:PublishSelfContained=true -r win-x64`;
   } else if (process.platform === 'darwin') {
-    targetFramework = 'net10.0-maccatalyst';
+    targetFramework = 'net9.0-maccatalyst';
     platformPublishArgs = `-p:CreatePackage=false -p:SuppressSdkDetection=true -p:_SuppressSdkDetection=true -p:SkipXcodeValidation=true`;
   } else {
     console.log(`Building for current default platform: ${process.platform}`);

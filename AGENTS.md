@@ -21,7 +21,7 @@ This application is primarily a **Desktop Application** built with .NET MAUI and
 ## Build Configuration
 
 - Use `.NET SDK` and MAUI workloads for distribution.
-- Configurations for MAUI target frameworks (`net10.0-maccatalyst` and `net10.0-windows10.0.19041.0`) are maintained in `maui/InterstitialerMaui.csproj`.
+- Configurations for MAUI target frameworks (`net9.0-maccatalyst` and `net9.0-windows10.0.19041.0`) are maintained in `maui/InterstitialerMaui.csproj`.
 - Distribution builds focus on `.dmg` or `.zip` on macOS, and `.exe` Installer (using Inno Setup) or `.zip` on Windows.
 - **Unified Build Invocation**: Both modern Admin and Player modules are packaged using the standard pipeline command: `npm run dist:maui`.
 - **GitHub Release-First Assumptions**: Always construct, refactor, and check code under the strict assumption that compilation and packaging occur on virtualized runners when building releases via the GitHub web interface. Ensure cross-platform build stability, explicit dependency typing, and robust bundler support to run seamlessly without interactive intervention.
