@@ -6,6 +6,25 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 22, 2026] Global Version Alignment & Fix Implementation for v0.1.9
+*   **Version Number Targeted**: `v0.1.9`
+*   **Source Log / Input URL**: Direct user approval and bump request.
+*   **Identified Issues**:
+    1. **SDK Target Evaluation Order**: As identified in the `v0.1.8` run, target overrides must be evaluated *after* the implicit SDK targets.
+*   **Proposed Resolution Paths**:
+    1. **Convert to Explicit SDK Imports & Override**: Refactored `/maui/InterstitialerMaui.csproj` to explicitly import `Sdk.props` and `Sdk.targets` from `Microsoft.NET.Sdk`, positioning the empty validation targets (`_CheckXcodeVersion`, `_DetectXcode`, `_DetectSdk`, `_CheckSdk`, `_ValidateXcode`, `_CheckXcode`, `_CheckMacCatalystXcode`) at the absolute bottom.
+    2. **Global Version Alignment**: Bumped product version from `0.1.8` to `0.1.9` across all manifests (`package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`).
+*   **Status / Final Execution**: **Executed and Resolved in release v0.1.9**
+
+### [Date: June 22, 2026] Analysis of MacCatalyst Xcode Version Mismatch Build Failure in v0.1.8
+*   **Version Number Targeted**: `v0.1.8`
+*   **Source Log / Input URL**: Supplied directly in prompt (logs from version v0.1.8 run). Refer to https://github.com/JON99999/Interstitial-er/actions for context.
+*   **Identified Issues**:
+    1. **SDK Target Overriding Sequence**: The empty target overrides for `_CheckXcodeVersion`, `_DetectXcode`, `_DetectSdk`, etc. declared inside `/maui/InterstitialerMaui.csproj` were ignored. This is because implicit SDK target imports from `<Project Sdk="Microsoft.NET.Sdk">` are appended at the very bottom of the MSBuild syntax hierarchy. Thus, the real Xamarin SDK targets file overrides our custom project definitions, running the active validation that demands Xcode 26.5.
+*   **Proposed Resolution Paths**:
+    1. **Convert to Explicit SDK Imports**: By removing the `Sdk="Microsoft.NET.Sdk"` attribute from the `<Project>` element, we can insert `<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />` at the very top of the `.csproj`, and `<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" /> right before our empty target overrides at the bottom. This ensures our custom targets are evaluated after the SDK targets are loaded, overriding the MacCatalyst Xcode version checks successfully.
+*   **Status / Final Execution**: **Executed and Resolved in release v0.1.9** via explicit `.csproj` imports refactoring.
+
 ### [Date: June 22, 2026] Global Version Alignment to v0.1.8
 *   **Version Number Targeted**: `v0.1.8`
 *   **Source Log / Input URL**: Explicit user instructions of version alignment.

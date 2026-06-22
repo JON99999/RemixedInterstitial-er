@@ -1,4 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0</TargetFrameworks>
@@ -17,7 +18,7 @@
     <!-- Display Name & App ID -->
     <ApplicationTitle>Interstitial-er</ApplicationTitle>
     <ApplicationId>com.interstitialer.scheduler.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.8</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.1.9</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('mac'))">13.1</SupportedOSPlatformVersion>
@@ -54,7 +55,10 @@
     </Content>
   </ItemGroup>
 
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
   <!-- Override SDK-specific validation targets to bypass host Xcode version checking on CI runners -->
+  <!-- Declaring them after Sdk.targets ensures these empty overrides take precedence -->
   <Target Name="_CheckXcodeVersion" />
   <Target Name="_DetectXcode" />
   <Target Name="_DetectSdk" />
