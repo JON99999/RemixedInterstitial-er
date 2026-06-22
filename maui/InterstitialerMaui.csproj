@@ -2,8 +2,8 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0</TargetFrameworks>
-    <TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('windows'))">net10.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('windows'))">net9.0-maccatalyst</TargetFrameworks>
     <!-- On Windows, allow simple portable folder extraction and execution -->
     <WindowsPackageType Condition="$([MSBuild]::IsOSPlatform('windows'))">None</WindowsPackageType>
     <OutputType Condition="'$(TargetFramework)' != '' and $(TargetFramework.Contains('-windows'))">WinExe</OutputType>
@@ -18,7 +18,7 @@
     <!-- Display Name & App ID -->
     <ApplicationTitle>Interstitial-er</ApplicationTitle>
     <ApplicationId>com.interstitialer.scheduler.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.9</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.1.10</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('mac'))">13.1</SupportedOSPlatformVersion>
@@ -43,9 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-preview.*" Condition="'$(TargetFramework)' == ''" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0-preview.*" Condition="'$(TargetFramework)' == ''" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.*" Condition="'$(TargetFramework)' == ''" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.*" Condition="'$(TargetFramework)' == ''" />
   </ItemGroup>
+
 
   <ItemGroup>
     <!-- Link and copy the compiled frontend web asset folder into the MAUI output bundle -->

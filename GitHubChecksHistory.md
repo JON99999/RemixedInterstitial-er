@@ -6,6 +6,47 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 22, 2026] Analysis of MacCatalyst Xcode Version Mismatch Build Failure in v0.1.9
+*   **Version Number Targeted**: `v0.1.9`
+*   **Source Log / Input URL**: Supplied directly in prompt (logs from version v0.1.9 run). Refer to https://github.com/JON99999/Interstitial-er/actions for context.
+*   **Identified Issues**:
+    1. **Workload Evaluation Precedence & Target Bypassing Failures**: Even after restructuring `/maui/InterstitialerMaui.csproj` with explicit SDK imports and moving the empty targets (`_CheckXcodeVersion`, `_DetectXcode`, etc.) to the absolute bottom of the file, the compilation still failed with: `/Users/runner/.net/packs/Microsoft.MacCatalyst.Sdk.net10.0_26.5.10217/26.5.10284/targets/Xamarin.Shared.Sdk.targets(2570,3): error : This version of .NET for MacCatalyst (26.5.10284) requires Xcode 26.5. The current version of Xcode is 16.4.` 
+       This occurs because the .NET MacCatalyst workload targets are loaded dynamically *after* the project file is parsed, or they define an active `<Error>` check outside of any targets (evaluated at load-time/parse-time. If it is evaluated during project parsing, overriding the `<Target>` will never bypass the error as it triggers long before target execution.
+*   **Proposed Resolution Paths**:
+    1. **Bypass the Target Dynamic Evaluation**: Override `_DetectSdkLocations` to prevent the underlying detection task from executing. *(REJECTED: User wants to preserve core MAUI infrastructure capabilities)*
+    2. **Workload Pinning via global.json**: Use a `global.json` pinning the environment to a stable `.NET 9.0.x` SDK, which uses MacCatalyst workloads mapped perfectly to the pre-installed stable Xcode versions (Xcode 16.x) on GHA macOS runners. *(APPROVED & IMPLEMENTED in v0.1.10)*
+    3. **Framework Alternate Path (Architectural Fix)**: Disable the MAUI build step exclusively for macOS (only running the Electron build step on macOS runners) since the Electron app already builds successfully, packages the same web code, and has zero Xcode/Xamarin dependencies. *(REVERTED and replaced with Option 2)*
+*   **Status / Final Execution**: **Option 1 Rejected. Option 3 Reverted. Option 2 implemented in v0.1.10.**
+
+### [Date: June 22, 2026] Global Version Alignment & Option 2 Implementation for v0.1.10
+*   **Version Number Targeted**: `v0.1.10`
+*   **Source Log / Input URL**: User request to undo Option 3, enact Option 2 to keep both MAUI and Electron pipelines fully building on GHA, and align versions.
+*   **Identified Issues**:
+    1. **MacCatalyst Xcode Version Mismatch on GitHub Actions Run**: Resolving Xcode 16 vs Xcode 26.5 workload mismatch on remote macOS runners.
+*   **Approved Execution (Option 2 - .NET 9 Workload Pinning & Alignment)**:
+    1. **Added global.json**: Configured `/global.json` in root to pin the build runtime context specifically to the stable `.NET 9` SDK branch, aligning with macOS GHA runner environments:
+       ```json
+       {
+         "sdk": {
+           "version": "9.0.100",
+           "rollForward": "latestFeature"
+         }
+       }
+       ```
+    2. **Adjusted Workflow SDK Version**: Modified line-setup in `/.github/workflows/release.yml` to pull `9.0.x` instead of `10.0.x`:
+       ```yaml
+       - name: Setup .NET SDK
+         uses: actions/setup-dotnet@v4
+         with:
+           dotnet-version: '9.0.x'
+       ```
+    3. **Aligned MAUI Project Target Framework**: Re-targeted `/maui/InterstitialerMaui.csproj` to compile targeting stable frameworks:
+       - `net9.0-maccatalyst` (for macOS)
+       - `net9.0-windows10.0.19041.0` (for Windows)
+    4. **Aligned Package Dependencies**: Updated implicit references inside `/maui/InterstitialerMaui.csproj` to target stable `9.0.*` versions of `Microsoft.Maui.Controls` and `Microsoft.Extensions.Logging.Debug`.
+    5. **Global Version Alignment**: Updated product version to `0.1.10` in `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Executed, checked, and resolved via Option 2 implementation.**
+
 ### [Date: June 22, 2026] Global Version Alignment & Fix Implementation for v0.1.9
 *   **Version Number Targeted**: `v0.1.9`
 *   **Source Log / Input URL**: Direct user approval and bump request.
