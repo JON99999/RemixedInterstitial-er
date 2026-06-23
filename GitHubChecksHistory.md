@@ -6,6 +6,25 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 23, 2026] Executing MSBuild Overrides & Version Realignment for v0.1.12
+*   **Version Number Targeted**: `v0.1.12`
+*   **Source Log / Input URL**: Direct user request implementing the proposed targets resolution from v0.1.11 diagnostics.
+*   **Identified Issues**:
+    1. **MacCatalyst Xcode Version verification**: Late-loading workload target files (`Xamarin.Shared.Sdk.targets`) override the validation target properties described inside `.csproj`.
+*   **Approved Execution**:
+    1. **Late-Import Overrides**: Established `/maui/Directory.Build.targets` containing empty overrides for `_CheckXcodeVersion`, `_DetectXcode`, `_DetectSdk`, `_CheckSdk`, `_ValidateXcode`, `_CheckXcode`, and `_CheckMacCatalystXcode`. This automatically overrides the dynamic workload targets as they load late in the MSBuild evaluation cycle.
+    2. **Global Version Alignment**: Promoted product version from `0.1.11` to `0.1.12` globally inside `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Executed, checked, and completely aligned in release v0.1.12.**
+
+### [Date: June 22, 2026] Analysis of MacCatalyst Xcode Validation Build Failure in v0.1.11
+*   **Version Number Targeted**: `v0.1.11`
+*   **Source Log / Input URL**: Supplied directly in prompt (GHA build logs showing `Xamarin.Shared.Sdk.targets(2346,3): error : This version of .NET for MacCatalyst (26.5.9002) requires Xcode 26.5. The current version of Xcode is 16.4`).
+*   **Identified Issues**:
+    1. **Late-Loading Workload Target Precedence**: Empty target overrides (e.g. `_CheckXcodeVersion`, `_CheckMacCatalystXcode`) introduced inside `/maui/InterstitialerMaui.csproj` are overwritten during the compilation phase. This is because the workload's dynamic target file (`Xamarin.Shared.Sdk.targets`) is imported *after* the primary body of the project is parsed and evaluated.
+*   **Proposed Resolution Paths**:
+    1. **Late MSBuild Overrides Execution via `Directory.Build.targets`**: Introduce `/maui/Directory.Build.targets` containing empty target overrides. In MSBuild structures, files named `Directory.Build.targets` are loaded automatically at the very end of processing — after all standard SDKs and workload targets have completed importing. Redefining the validation targets here ensures they supersede the SDK checking targets.
+*   **Status / Final Execution**: **Approved by user. Implemented and resolved in v0.1.12.**
+
 ### [Date: June 22, 2026] Global Target Mismatch Remediation & Version Realignment for v0.1.11
 *   **Version Number Targeted**: `v0.1.11`
 *   **Source Log / Input URL**: Supplied directly in prompt (GHA runner logs showing error `NETSDK1045: The current .NET SDK does not support targeting .NET 10.0`).

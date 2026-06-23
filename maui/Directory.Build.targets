@@ -1,0 +1,11 @@
+<Project>
+  <!-- Override SDK-specific validation targets to bypass host Xcode version checking on CI runners -->
+  <!-- Directory.Build.targets is imported automatically at the very end of Sdk targets execution, overriding late workload targets -->
+  <Target Name="_CheckXcodeVersion" />
+  <Target Name="_DetectXcode" />
+  <Target Name="_DetectSdk" />
+  <Target Name="_CheckSdk" />
+  <Target Name="_ValidateXcode" />
+  <Target Name="_CheckXcode" />
+  <Target Name="_CheckMacCatalystXcode" />
+</Project>
