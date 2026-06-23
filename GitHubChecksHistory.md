@@ -6,6 +6,18 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 23, 2026] Analysis of MacCatalyst Compiler Entry Point Build Failure in v0.1.12
+*   **Version Number Targeted**: `v0.1.12`
+*   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions build logs showing `CSC : error CS5001: Program does not contain a static 'Main' method suitable for an entry point [/Users/runner/work/RemixedInterstitial-er/RemixedInterstitial-er/maui/InterstitialerMaui.csproj::TargetFramework=net9.0-maccatalyst]`).
+*   **Identified Issues**:
+    1. **Missing MacCatalyst Bootstrap Files (CS5001)**: The `/maui/Platforms/` folder contains a Windows platform directory but does not contain a `MacCatalyst` directory or any bootstrap files (`Program.cs`, `AppDelegate.cs`) for the Apple MacCatalyst platform target. Therefore, when compiling the MAUI application for `net9.0-maccatalyst`, the C# compiler (CSC) fails because there is no static `Main` method defined.
+*   **Proposed Resolution Paths**:
+    1. **Establish MacCatalyst Bootstrappers**: Create the `/maui/Platforms/MacCatalyst/` subdirectory and add:
+       * `/maui/Platforms/MacCatalyst/AppDelegate.cs` (inheriting from `MauiUIApplicationDelegate` and calling `MauiProgram.CreateMauiApp()`)
+       * `/maui/Platforms/MacCatalyst/Program.cs` (defining the static `Main` entry point calling `UIApplication.Main(...)`)
+    2. **Version Realignment**: When the changes are approved to be committed, align the version to `0.1.13` across `package.json`, `package-lock.json`, and `InterstitialerMaui.csproj` to produce a clean pipeline release run.
+*   **Status / Final Execution**: **Executed, checked, and completely aligned in release v0.1.13.**
+
 ### [Date: June 23, 2026] Executing MSBuild Overrides & Version Realignment for v0.1.12
 *   **Version Number Targeted**: `v0.1.12`
 *   **Source Log / Input URL**: Direct user request implementing the proposed targets resolution from v0.1.11 diagnostics.
