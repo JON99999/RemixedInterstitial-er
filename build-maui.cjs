@@ -51,7 +51,7 @@ function buildMauiApp(mode) {
     platformPublishArgs = `-p:WindowsPackageType=None -p:SelfContained=true -p:PublishSelfContained=true -r win-x64`;
   } else if (process.platform === 'darwin') {
     targetFramework = 'net9.0-maccatalyst';
-    platformPublishArgs = `-p:CreatePackage=false -p:SuppressSdkDetection=true -p:_SuppressSdkDetection=true -p:SkipXcodeValidation=true`;
+    platformPublishArgs = `-p:CreatePackage=false -p:SuppressSdkDetection=true -p:_SuppressSdkDetection=true -p:SkipXcodeValidation=true -p:SdkValidation=false -p:_SdkValidation=false`;
   } else {
     console.log(`Building for current default platform: ${process.platform}`);
     return;

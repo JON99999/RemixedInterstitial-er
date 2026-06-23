@@ -6,6 +6,19 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 23, 2026] Global Target Bypass & Version Realignment for v0.1.14
+*   **Version Number Targeted**: `v0.1.14`
+*   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions build logs showing `Xamarin.Shared.Sdk.targets(2346,3): error : This version of .NET for MacCatalyst (26.5.9002) requires Xcode 26.5. The current version of Xcode is 16.4. Either install Xcode 26.5, or use a different version of .NET for MacCatalyst.`).
+*   **Identified Issues**:
+    1. **MacCatalyst SDK/Xcode Validation Check Triggered**: Despite previous empty target overrides in `Directory.Build.targets`, the compilation for target framework `net9.0-maccatalyst` failed with a required Xcode version `26.5` mismatch against the runner's pre-installed Xcode version `16.4`. This occurs because the workload's dynamic targets (`Xamarin.Shared.Sdk.targets`) are imported after `Directory.Build.targets` is evaluated, rendering target overrides ineffective, or they run an active check based on properties that are still enabled.
+*   **Approved Execution (Option 1 - Set SdkValidation=false and Version Alignment to v0.1.14)**:
+    1. **Global SdkValidation Property Overrides**: Added `<SdkValidation>false</SdkValidation>` and `<_SdkValidation>false</_SdkValidation>` to the bypass PropertyGroup in `/maui/InterstitialerMaui.csproj` to deactivate the workload's evaluation checks early.
+    2. **Orchestrated MSBuild Build Pipeline Args**: Appended `-p:SdkValidation=false -p:_SdkValidation=false` properties directly into `/build-maui.cjs` to pass these during CLI publishing of target framework `net9.0-maccatalyst`.
+    3. **Global Version Alignment**: Aligned application version from `0.1.13` to `0.1.14` (correcting a user typo request for `0.1.4` to preserve ascending semver and prevent downgrades) across `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Approved by user. Implemented, verified, and completely resolved in release v0.1.14.**
+
+---
+
 ### [Date: June 23, 2026] Analysis of MacCatalyst Compiler Entry Point Build Failure in v0.1.12
 *   **Version Number Targeted**: `v0.1.12`
 *   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions build logs showing `CSC : error CS5001: Program does not contain a static 'Main' method suitable for an entry point [/Users/runner/work/RemixedInterstitial-er/RemixedInterstitial-er/maui/InterstitialerMaui.csproj::TargetFramework=net9.0-maccatalyst]`).

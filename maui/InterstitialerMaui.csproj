@@ -18,7 +18,7 @@
     <!-- Display Name & App ID -->
     <ApplicationTitle>Interstitial-er</ApplicationTitle>
     <ApplicationId>com.interstitialer.scheduler.maui</ApplicationId>
-    <ApplicationDisplayVersion>0.1.13</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.1.14</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::IsOSPlatform('mac'))">13.1</SupportedOSPlatformVersion>
@@ -35,6 +35,8 @@
     <SuppressSdkDetection>true</SuppressSdkDetection>
     <_SuppressSdkDetection>true</_SuppressSdkDetection>
     <SkipXcodeValidation>true</SkipXcodeValidation>
+    <SdkValidation>false</SdkValidation>
+    <_SdkValidation>false</_SdkValidation>
   </PropertyGroup>
 
   <ItemGroup>
