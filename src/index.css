@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
+@source "../src/**/*.tsx";
+@source "../src/**/*.ts";
+@source "../index.html";
+
 :root {
   /* Centralized base border settings */
   --grid-border-base: #000000;

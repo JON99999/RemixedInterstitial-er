@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+release_temp/
+maui/bin/
+maui/obj/
+bin/
+obj/

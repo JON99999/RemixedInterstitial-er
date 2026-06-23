@@ -4,6 +4,23 @@ const path = require('path');
 
 console.log('Starting parallel .NET MAUI build pipeline (Player/Admin)...');
 
+// Recursively find a folder/file matching targetName within a directory tree
+function findAppBundle(dir, targetName) {
+  if (!fs.existsSync(dir)) return null;
+  const items = fs.readdirSync(dir, { withFileTypes: true });
+  for (const item of items) {
+    const fullPath = path.join(dir, item.name);
+    if (item.isDirectory()) {
+      if (item.name === targetName) {
+        return fullPath;
+      }
+      const found = findAppBundle(fullPath, targetName);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 const releaseDir = path.join(__dirname, 'release');
 const tempReleaseDir = path.join(__dirname, 'release_temp');
 
@@ -136,10 +153,24 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
     }
   } else if (process.platform === 'darwin') {
     // Locate the .app bundle
-    const appBundlePath = path.join(modeOutputDir, 'InterstitialerMaui.app');
+    let appBundlePath = path.join(modeOutputDir, 'InterstitialerMaui.app');
     if (!fs.existsSync(appBundlePath)) {
-      console.error(`Could not locate built .app bundle at: ${appBundlePath}`);
-      return;
+      console.log(`Initial path InterstitialerMaui.app not found. Searching subdirectories recursively...`);
+      const foundPath = findAppBundle(modeOutputDir, 'InterstitialerMaui.app');
+      if (foundPath) {
+        console.log(`Found built .app bundle at nested path: ${foundPath}`);
+        try {
+          // Relocate the nested .app bundle to the standard top-level modeOutputDir to preserve uniform downstream packaging
+          fs.renameSync(foundPath, appBundlePath);
+          console.log(`Relocated nested bundle to standard path: ${appBundlePath}`);
+        } catch (moveErr) {
+          console.error(`Failed to relocate nested app bundle: ${moveErr.message}. Falling back to using nested path directly.`);
+          appBundlePath = foundPath;
+        }
+      } else {
+        console.error(`Could not locate built .app bundle at or under: ${modeOutputDir}`);
+        return;
+      }
     }
 
     const humanAppName = `Interstitial-er ${mode} (MAUI)`;

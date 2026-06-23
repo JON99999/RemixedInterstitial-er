@@ -6,6 +6,30 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 23, 2026] Global Version Alignment & Integration Verification for v0.1.16
+*   **Version Number Targeted**: `v0.1.16`
+*   **Source Log / Input URL**: Explicit user request to lock in hotfixes and prepare the next scheduled release build.
+*   **Identified Issues**:
+    1. **Release Progression & Packaging**: Promoted the codebase versioning structure to `0.1.16` to consolidate and finalize verified changes (including Tailwind CSS v4 glob scoping rules in CSS, nested `.app` bundle relocation routines in MAUI build scripts, and build runner exclusions).
+*   **Approved Execution**:
+    1. **Global Version Alignment**: Aligned application version from `0.1.15` to `0.1.16` across `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+    2. **Verification & History Consolidation**: Verified local compilation of the player and consolidated change logs.
+*   **Status / Final Execution**: **Approved by user. Implemented, verified, and completely resolved in release v0.1.16.**
+
+### [Date: June 23, 2026] Player Build CSS Parser Failure and MacCatalyst App Bundle Relocation in v0.1.15
+*   **Version Number Targeted**: `v0.1.15`
+*   **Source Log / Input URL**: Supplied directly in prompt (GHA build logs showing `error during build: [vite:css] [postcss] .../src/index.css:2:69295: Missed semicolon` during the Player build, and `Could not locate built .app bundle at: .../release_temp/Admin/InterstitialerMaui.app` during the Admin packaging step).
+*   **Identified Issues**:
+    1. **Un-ignored C# Build Artifacts Scanned by Tailwind CSS v4 (Player Vite Build Failure)**: The `.gitignore` file lacked `release_temp/` and C# build output paths. During the sequential build pipeline, the Admin build compiled binaries into `release_temp/Admin/`. In the subsequent Player build step, the Tailwind CSS v4 compiler (`@tailwindcss/vite`) scanned the entire workspace tree. Arbitrary binary files inside `release_temp/` containing bracket structures were incorrectly parsed as arbitrary Tailwind classes, generating malformed CSS code that triggered PostCSS's "Missed semicolon" syntax exception.
+    2. **Architecture-Specific Subdirectory Placement of MacCatalyst App Bundle**: When `dotnet publish` compiles MacCatalyst for multi-architecture targets (`x64` and `arm64`) with `-o`, it places the packaged `.app` bundle inside architecture-specific subdirectories (e.g. `maccatalyst-x64/` or `maccatalyst-arm64/`) inside `release_temp/Admin`, rendering the flat check inside `/build-maui.cjs` ineffective.
+    3. **Tailwind CSS v4 `@source` Excluded Directories Syntax Restriction**: When attempting to use `@source not(...)` directly without a leading pattern in `src/index.css`, the Tailwind CSS v4 compiler threw a parse error (`@source paths must be quoted`).
+*   **Approved Execution**:
+    1. **Exclusion of C# and Temporary Build Folders**: Added `release_temp/`, `maui/bin/`, `maui/obj/`, `bin/`, and `obj/` to `.gitignore`.
+    2. **Explicit Standard `@source` Glob Scoping**: Registered standard, quoted `@source` patterns (`"../src/**/*.tsx"`, `"../src/**/*.ts"`, and `"../index.html"`) directly inside `src/index.css`. This tells Tailwind v4 explicitly what folders to scan, automatically disabling the global automatic source scanner and completely protecting the build process from reading compiled binaries or temporary outputs.
+    3. **Recursive .app Bundle Locator & Dynamic Relocation**: Created a robust recursive lookup helper `findAppBundle` within `/build-maui.cjs` to search nested folders under `modeOutputDir`. If `InterstitialerMaui.app` is detected in a nested subdirectory, it is dynamically relocated up to the expected standard top-level path to support subsequent packaging (renaming and `hdiutil` / `zip` publishing).
+    4. **Global Version Alignment**: Aligned the version to `0.1.15` across `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Approved by user. Implemented, verified, and completely resolved in release v0.1.15.**
+
 ### [Date: June 23, 2026] Global Target Bypass & Version Realignment for v0.1.14
 *   **Version Number Targeted**: `v0.1.14`
 *   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions build logs showing `Xamarin.Shared.Sdk.targets(2346,3): error : This version of .NET for MacCatalyst (26.5.9002) requires Xcode 26.5. The current version of Xcode is 16.4. Either install Xcode 26.5, or use a different version of .NET for MacCatalyst.`).
