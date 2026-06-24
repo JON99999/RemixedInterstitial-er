@@ -5,6 +5,18 @@ This document serves as the persistent historical log of all inquiries made via 
 ---
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
+ 
+### [Date: June 24, 2026] MacCatalyst SDK Version Mapping Error & Version Promotion to v0.1.18
+*   **Version Number Targeted**: `v0.1.18` (Encountered as failure on `v0.1.17` build run, resolved via version promotion to `v0.1.18`)
+*   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions build log showing `error : Could not map the Mac Catalyst version 26.5 to a corresponding macOS version. Valid Mac Catalyst versions are: 13.1, 13.2, 13.3, 13.3.1, ... 18.5`).
+*   **Identified Issues**:
+    1. **MacCatalyst Default Platform Version mapping bug**: In .NET 9, when TargetFramework is configured as `net9.0-maccatalyst`, the default platform version resolves to the .NET MacCatalyst SDK version (`26.5` / `26.5.9002`) instead of a valid macOS/Mac Catalyst version. This version mapping fails inside `Xamarin.Shared.targets` because version `26.5` does not correspond to any valid macOS SDK version.
+*   **Approved Execution**:
+    1. **Explicit MacCatalyst TFM Version Definition**: Switched the Mac Catalyst target framework moniker from `net9.0-maccatalyst` to the explicit `net9.0-maccatalyst18.0` inside `/maui/InterstitialerMaui.csproj` and `/build-maui.cjs`. This forces MSBuild to parse a valid and fully supported Mac Catalyst platform version (`18.0` for macOS Sequoia), completely bypassing the SDK version mapping bug while maintaining deployment down to macOS `13.1`.
+    2. **Global Version Promotion**: Promoted the application's release version to `0.1.18` across `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Approved by user. Implemented, verified, and completely resolved in release v0.1.18.**
+
+---
 
 ### [Date: June 24, 2026] MacCatalyst SDK Xcode Version Check Bypass & Version Promotion to v0.1.17
 *   **Version Number Targeted**: `v0.1.17` (Encountered as failure on `v0.1.16` build run, resolved via version promotion to `v0.1.17`)
