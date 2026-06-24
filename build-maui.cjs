@@ -156,19 +156,35 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
     let appBundlePath = path.join(modeOutputDir, 'InterstitialerMaui.app');
     if (!fs.existsSync(appBundlePath)) {
       console.log(`Initial path InterstitialerMaui.app not found. Searching subdirectories recursively...`);
-      const foundPath = findAppBundle(modeOutputDir, 'InterstitialerMaui.app');
+      let foundPath = findAppBundle(modeOutputDir, 'InterstitialerMaui.app');
+      if (!foundPath) {
+        console.log(`Not found under modeOutputDir. Searching in standard MAUI bin Release directory...`);
+        const arm64Path = path.join(__dirname, 'maui', 'bin', 'Release', 'net9.0-maccatalyst18.0', 'maccatalyst-arm64');
+        const x64Path = path.join(__dirname, 'maui', 'bin', 'Release', 'net9.0-maccatalyst18.0', 'maccatalyst-x64');
+        const binPath = path.join(__dirname, 'maui', 'bin');
+        
+        foundPath = findAppBundle(arm64Path, 'InterstitialerMaui.app')
+          || findAppBundle(x64Path, 'InterstitialerMaui.app')
+          || findAppBundle(binPath, 'InterstitialerMaui.app');
+      }
+
       if (foundPath) {
-        console.log(`Found built .app bundle at nested path: ${foundPath}`);
+        console.log(`Found built .app bundle at path: ${foundPath}`);
         try {
           // Relocate the nested .app bundle to the standard top-level modeOutputDir to preserve uniform downstream packaging
-          fs.renameSync(foundPath, appBundlePath);
-          console.log(`Relocated nested bundle to standard path: ${appBundlePath}`);
+          if (fs.cpSync) {
+            fs.cpSync(foundPath, appBundlePath, { recursive: true });
+            try { fs.rmSync(foundPath, { recursive: true, force: true }); } catch (rmErr) {}
+          } else {
+            fs.renameSync(foundPath, appBundlePath);
+          }
+          console.log(`Relocated bundle to standard path: ${appBundlePath}`);
         } catch (moveErr) {
-          console.error(`Failed to relocate nested app bundle: ${moveErr.message}. Falling back to using nested path directly.`);
+          console.error(`Failed to relocate app bundle: ${moveErr.message}. Falling back to using found path directly.`);
           appBundlePath = foundPath;
         }
       } else {
-        console.error(`Could not locate built .app bundle at or under: ${modeOutputDir}`);
+        console.error(`Could not locate built .app bundle anywhere under ${modeOutputDir} or the project bin/ directory.`);
         return;
       }
     }

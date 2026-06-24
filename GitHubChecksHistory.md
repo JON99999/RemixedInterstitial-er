@@ -5,7 +5,28 @@ This document serves as the persistent historical log of all inquiries made via 
 ---
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
- 
+
+### [Date: June 24, 2026] Global Version Alignment to v0.1.19
+*   **Version Number Targeted**: `v0.1.19`
+*   **Source Log / Input URL**: Direct user request.
+*   **Identified Issues**: N/A (Standard version bump following the robust MacCatalyst bundle relocation fixes in `v0.1.18`).
+*   **Approved Execution**:
+    1. **Global Version Promotion**: Updated application version string to `0.1.19` across `package.json`, `package-lock.json`, and `/maui/InterstitialerMaui.csproj`.
+*   **Status / Final Execution**: **Executed, checked, and completely aligned locally.**
+
+---
+
+### [Date: June 24, 2026] MacCatalyst .app Bundle Location Analysis under v0.1.18
+*   **Version Number Targeted**: `v0.1.18`
+*   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions release logs showing `Could not locate built .app bundle at or under: .../release_temp/Admin` and `.../release_temp/Player`).
+*   **Identified Issues**:
+    1. **MacCatalyst Output Directory Redirection Ignored**: During Mac Catalyst publishing, `-o` or `--output` properties are not fully respected by the iOS/macOS compilation workload. Specifically, the generated `.app` bundle directory remains placed inside the default `maui/bin/Release/net9.0-maccatalyst18.0/maccatalyst-x64/` and `/maccatalyst-arm64/` directories rather than the customized `release_temp/Admin` or `/Player` directories.
+*   **Approved Execution / Recommendations**:
+    1. **Robust bin/ Fallback Directory Scanner**: Enhanced the recursive lookup helper `findAppBundle` in `/build-maui.cjs`. When the `.app` bundle is not located in the target release folder, the helper automatically checks the default `maui/bin/` directory and its architecture-specific release subdirectories, relocating the built `.app` bundle to the expected target path for standard DMG generation.
+*   **Status / Final Execution**: **Identified, corrected in local scripts, and logged.**
+
+---
+
 ### [Date: June 24, 2026] MacCatalyst SDK Version Mapping Error & Version Promotion to v0.1.18
 *   **Version Number Targeted**: `v0.1.18` (Encountered as failure on `v0.1.17` build run, resolved via version promotion to `v0.1.18`)
 *   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions build log showing `error : Could not map the Mac Catalyst version 26.5 to a corresponding macOS version. Valid Mac Catalyst versions are: 13.1, 13.2, 13.3, 13.3.1, ... 18.5`).
