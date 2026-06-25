@@ -6,6 +6,35 @@ This document serves as the persistent historical log of all inquiries made via 
 
 ## Historical Ledger of GitHub Runs & Workspace Changes
 
+### [Date: June 24, 2026] Transition to Dual Intel Strategy & Apple Silicon Lower-Limit Optimization for v0.1.22
+*   **Version Number Targeted**: `v0.1.22`
+*   **Source Log / Input URL**: Explicit user instruction to design dual Intel builds (Modern for macOS 15+ and Legacy for macOS 13+ backward compatibility) and compile Silicon builds to run on the widest possible range.
+*   **Identified Issues**:
+    *   **TargetPlatformVersion Limitations**: The previous target `16.0` failed compilation because the host runner has workloads for target versions `18.0` and `26.5`. To build successfully, we must target `net9.0-maccatalyst18.0`.
+*   **Recommended & Executed Solution**:
+    1. **Apple Silicon Optimization**: Configured Silicon target with framework `net9.0-maccatalyst18.0` and `minOS: '15.0'`. Since .NET 9's lowest MacCatalyst target is iOS 15.0 (macOS 12.0 Monterey), this maximizes Apple Silicon compatibility across M1-M4 devices.
+    2. **Modern Intel Build**: Built for `net9.0-maccatalyst18.0` with `minOS: '18.0'`, targeting macOS 15.0 Sequoia and later natively.
+    3. **Legacy Intel Build**: Built for `net9.0-maccatalyst18.0` with `minOS: '16.0'`, targeting macOS 13.0 Ventura backward compatibility.
+    4. **Global Version Promotion**: Updated all packages, package lock, and C# csproj version strings to `0.1.22`.
+*   **Status / Final Execution**: Successfully updated configuration in `build-maui.cjs`, promoted versions globally, and verified compilation.
+
+---
+
+### [Date: June 24, 2026] Resolution of TargetPlatformVersion 16.0 Error on GitHub Actions for v0.1.21
+*   **Version Number Targeted**: `v0.1.21`
+*   **Source Log / Input URL**: Supplied directly in prompt (GitHub Actions logs showing `NETSDK1140: 16.0 is not a valid TargetPlatformVersion for MacCatalyst`).
+*   **Identified Issues**:
+    *   **Runner Workload Restrictions**: The GitHub Actions runner environment has workloads installed only for TargetPlatformVersions `18.0` and `26.5`. Compiling with target framework `net9.0-maccatalyst16.0` fails because MacCatalyst SDK 16.0 is not installed/valid on the host.
+*   **Recommended Solution**:
+    1. **Rollback Target Framework**: Update the target framework for both Silicon and Intel builds to `net9.0-maccatalyst18.0` in `build-maui.cjs`.
+    2. **Define Compatible minOS**: Configure `minOS` for both builds as `'15.0'`. Because the `18.0` SDK enforces a minimum value of `15.0` (which maps to macOS 12.0 Monterey), this meets the constraint while maintaining maximum compatibility.
+    3. **Compatibility Matrix Verification**:
+        *   **Apple Silicon (M1-M4)**: Fully compatible. Since M1 Macs run Monterey and Sonoma/Sequoia natively, a minimum target of macOS 12.0 (15.0) will run on every single Apple Silicon Mac from M1 to M4.
+        *   **Intel Macs**: Fully compatible. macOS 12.0 Monterey goes back further than the requested macOS 13.0 Ventura, allowing older Intel Macs to run the bundle, while running up to macOS 15.0 Sequoia.
+*   **Status / Final Execution**: Pending user approval of suggested changes.
+
+---
+
 ### [Date: June 24, 2026] Global Version Alignment to v0.1.21 & macOS 26/27 Compatibility Audit
 *   **Version Number Targeted**: `v0.1.21`
 *   **Source Log / Input URL**: User instruction to update to version `0.1.21` and assess compatibility for future macOS versions (macOS Tahoe 26 and macOS 27 Golden Gate).

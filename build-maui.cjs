@@ -245,21 +245,28 @@ Description: "Launch ${humanAppName}"; Filename: "{app}\\InterstitialerMaui.exe"
   try {
     const isMac = process.platform === 'darwin';
 
-    // Mac-specific build variants to support both Apple Silicon and Intel legacy platforms
+    // Mac-specific build variants to support Apple Silicon and dual Intel targets (Modern and Legacy)
     const macVariants = [
       {
-        id: 'Silicon-new',
-        suffix: 'Mac-Silicon-new-maui',
-        targetFramework: 'net9.0-maccatalyst16.0',
+        id: 'Silicon',
+        suffix: 'Mac-Silicon-maui',
+        targetFramework: 'net9.0-maccatalyst18.0',
         rid: 'maccatalyst-arm64',
-        minOS: '13.1'
+        minOS: '15.0' // macOS 12.0 Monterey - lowest supported by .NET 9
+      },
+      {
+        id: 'Intel-modern',
+        suffix: 'Mac-Intel-modern-maui',
+        targetFramework: 'net9.0-maccatalyst18.0',
+        rid: 'maccatalyst-x64',
+        minOS: '18.0' // macOS 15.0 Sequoia and later
       },
       {
         id: 'Intel-legacy',
         suffix: 'Mac-Intel-legacy-maui',
-        targetFramework: 'net9.0-maccatalyst16.0',
+        targetFramework: 'net9.0-maccatalyst18.0',
         rid: 'maccatalyst-x64',
-        minOS: '13.1'
+        minOS: '16.0' // macOS 13.0 Ventura and later
       }
     ];
 
