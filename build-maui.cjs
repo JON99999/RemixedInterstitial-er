@@ -54,21 +54,36 @@ function compileViteAssets(mode) {
   console.log(`Wrote dist/app-config.json for MAUI mode: ${mode}.`);
 }
 
-function buildMauiApp(mode) {
-  console.log(`\nCompiling .NET MAUI Parallel C# Application for mode: ${mode}...`);
-  const csprojPath = path.join(__dirname, 'maui', 'InterstitialerMaui.csproj');
-  const modeOutputDir = path.join(tempReleaseDir, mode);
+function cleanMauiIntermediate() {
+  console.log('Cleaning up Maui bin and obj directories for pristine build state...');
+  const binDir = path.join(__dirname, 'maui', 'bin');
+  const objDir = path.join(__dirname, 'maui', 'obj');
+  if (fs.existsSync(binDir)) {
+    fs.rmSync(binDir, { recursive: true, force: true });
+  }
+  if (fs.existsSync(objDir)) {
+    fs.rmSync(objDir, { recursive: true, force: true });
+  }
+}
 
-  let targetFramework = '';
+function buildMauiApp(mode, variantId, targetFramework, rid, minOS) {
+  console.log(`\nCompiling .NET MAUI Parallel C# Application for mode: ${mode} [${variantId}]...`);
+  const csprojPath = path.join(__dirname, 'maui', 'InterstitialerMaui.csproj');
+  const modeOutputDir = path.join(tempReleaseDir, `${mode}_${variantId}`);
+
   let platformPublishArgs = '';
 
   if (process.platform === 'win32') {
-    targetFramework = 'net9.0-windows10.0.19041.0';
     // On Windows, publish as a completely self-contained deployment bundled with .NET runtime
     platformPublishArgs = `-p:WindowsPackageType=None -p:SelfContained=true -p:PublishSelfContained=true -r win-x64`;
   } else if (process.platform === 'darwin') {
-    targetFramework = 'net9.0-maccatalyst18.0';
     platformPublishArgs = `-p:CreatePackage=false -p:SuppressSdkDetection=true -p:_SuppressSdkDetection=true -p:SkipXcodeValidation=true -p:SdkValidation=false -p:_SdkValidation=false`;
+    if (rid) {
+      platformPublishArgs += ` -r ${rid}`;
+    }
+    if (minOS) {
+      platformPublishArgs += ` -p:SupportedOSPlatformVersion=${minOS}`;
+    }
   } else {
     console.log(`Building for current default platform: ${process.platform}`);
     return;
@@ -79,23 +94,24 @@ function buildMauiApp(mode) {
   
   try {
     execSync(buildCmd, { stdio: 'inherit' });
-    console.log(`Successfully built .NET MAUI program binary for ${mode}.`);
+    console.log(`Successfully built .NET MAUI program binary for ${mode} [${variantId}].`);
   } catch (err) {
-    console.error(`Failed to compile C# MAUI program for ${mode}:`, err.message);
+    console.error(`Failed to compile C# MAUI program for ${mode} [${variantId}]:`, err.message);
     throw err;
   }
 }
 
-function packageMauiApp(mode) {
-  console.log(`\nPackaging and renaming C# MAUI artifact outputs for mode: ${mode}...`);
-  const modeOutputDir = path.join(tempReleaseDir, mode);
+function packageMauiApp(mode, variantId, suffix) {
+  console.log(`\nPackaging and renaming C# MAUI artifact outputs for mode: ${mode} [${variantId}]...`);
+  const modeOutputDir = path.join(tempReleaseDir, `${mode}_${variantId}`);
 
   // Read version dynamically from package.json
   const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
   const version = pkg.version;
 
   if (process.platform === 'win32') {
-    const installerName = `Interstitial-er-Setup-${mode}-${version}-MAUI.exe`;
+    const humanAppName = `Interstitial-er ${mode}`;
+    const installerName = `${humanAppName}-${version}-Windows-Installer-maui.exe`;
     const installerPath = path.join(releaseDir, installerName);
 
     // Dynamic Inno Setup Script Generation
@@ -107,12 +123,12 @@ function packageMauiApp(mode) {
 
     const issContent = `
 [Setup]
-AppName=Interstitial-er ${mode} (MAUI)
+AppName=${humanAppName} (MAUI)
 AppVersion=${version}
-DefaultDirName={autopf}\\Interstitial-er ${mode} (MAUI)
-DefaultGroupName=Interstitial-er ${mode} (MAUI)
+DefaultDirName={autopf}\\${humanAppName} (MAUI)
+DefaultGroupName=${humanAppName} (MAUI)
 OutputDir=${releaseDir.replace(/\\/g, '\\\\')}
-OutputBaseFilename=Interstitial-er-Setup-${mode}-${version}-MAUI
+OutputBaseFilename=${humanAppName}-${version}-Windows-Installer-maui
 Compression=lzma
 SolidCompression=yes
 DisableProgramGroupPage=yes
@@ -123,11 +139,11 @@ ${setupIconLine}
 Source: "${modeOutputDir.replace(/\\/g, '\\\\')}\\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\\Interstitial-er ${mode} (MAUI)"; Filename: "{app}\\InterstitialerMaui.exe"
-Name: "{autodesktop}\\Interstitial-er ${mode} (MAUI)"; Filename: "{app}\\InterstitialerMaui.exe"
+Name: "{group}\\${humanAppName} (MAUI)"; Filename: "{app}\\InterstitialerMaui.exe"
+Name: "{autodesktop}\\${humanAppName} (MAUI)"; Filename: "{app}\\InterstitialerMaui.exe"
 
 [Run]
-Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerMaui.exe"; Flags: postinstall nowait skipifsilent
+Description: "Launch ${humanAppName}"; Filename: "{app}\\InterstitialerMaui.exe"; Flags: postinstall nowait skipifsilent
 `;
 
     try {
@@ -140,7 +156,7 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
     } catch (e) {
       console.warn(`Windows Inno Setup execution skipped or failed (${e.message}). Falling back to self-contained ZIP packaging.`);
       
-      const outputZipPath = path.join(releaseDir, `Interstitial-er-${mode}-${version}-MAUI.zip`);
+      const outputZipPath = path.join(releaseDir, `${humanAppName}-${version}-Windows-Installer-maui.zip`);
       console.log(`Compressing self-contained Windows output structure to ZIP: ${outputZipPath}`);
       
       const zipCmd = `powershell -NoProfile -Command "Compress-Archive -Path '${modeOutputDir}/*' -DestinationPath '${outputZipPath}' -Force"`;
@@ -159,13 +175,8 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
       let foundPath = findAppBundle(modeOutputDir, 'InterstitialerMaui.app');
       if (!foundPath) {
         console.log(`Not found under modeOutputDir. Searching in standard MAUI bin Release directory...`);
-        const arm64Path = path.join(__dirname, 'maui', 'bin', 'Release', 'net9.0-maccatalyst18.0', 'maccatalyst-arm64');
-        const x64Path = path.join(__dirname, 'maui', 'bin', 'Release', 'net9.0-maccatalyst18.0', 'maccatalyst-x64');
         const binPath = path.join(__dirname, 'maui', 'bin');
-        
-        foundPath = findAppBundle(arm64Path, 'InterstitialerMaui.app')
-          || findAppBundle(x64Path, 'InterstitialerMaui.app')
-          || findAppBundle(binPath, 'InterstitialerMaui.app');
+        foundPath = findAppBundle(binPath, 'InterstitialerMaui.app');
       }
 
       if (foundPath) {
@@ -203,7 +214,7 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
       console.error(`Failed to rename build bundle directory:`, renameErr.message);
     }
 
-    const dmgName = `Interstitial-er-${mode}-${version}-MAUI.dmg`;
+    const dmgName = `Interstitial-er ${mode}-${version}-${suffix}.dmg`;
     const dmgPath = path.join(releaseDir, dmgName);
 
     console.log(`Packaging macOS volume structure directly to Disk Image (.dmg): ${dmgPath}`);
@@ -216,7 +227,7 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
     } catch (dmgErr) {
       console.error(`Failed to build native DMG volume (${dmgErr.message}). Falling back to standard compressed zip bundle...`);
 
-      const outputZipPath = path.join(releaseDir, `Interstitial-er-${mode}-${version}-MAUI.zip`);
+      const outputZipPath = path.join(releaseDir, `Interstitial-er ${mode}-${version}-${suffix}.zip`);
       const zipCmd = `zip -r "${outputZipPath}" "${humanAppName}.app"`;
       try {
         execSync(zipCmd, { cwd: modeOutputDir, stdio: 'inherit' });
@@ -232,14 +243,52 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
 
 (async () => {
   try {
+    const isMac = process.platform === 'darwin';
+
+    // Mac-specific build variants to support both Path B and Path C
+    const macVariants = [
+      {
+        id: 'Silicon-new',
+        suffix: 'Mac-Silicon-new-maui',
+        targetFramework: 'net9.0-maccatalyst18.0',
+        rid: 'maccatalyst-arm64',
+        minOS: '14.0'
+      },
+      {
+        id: 'Intel-legacy',
+        suffix: 'Mac-Intel-legacy-maui',
+        targetFramework: 'net9.0-maccatalyst16.0',
+        rid: 'maccatalyst-x64',
+        minOS: '13.1'
+      },
+      {
+        id: 'Combined',
+        suffix: 'Mac-combined-maui',
+        targetFramework: 'net9.0-maccatalyst18.0',
+        rid: null, // build universal
+        minOS: '14.0'
+      }
+    ];
+
     // --- Step 1: Admin Build ---
     console.log('\n=========================================');
     console.log(' BUILDING INTERSTITIAL-ER MAUI - ADMIN ');
     console.log('=========================================\n');
     cleanViteBuild();
     compileViteAssets('Admin');
-    buildMauiApp('Admin');
-    packageMauiApp('Admin');
+
+    if (isMac) {
+      for (const variant of macVariants) {
+        console.log(`\n--- Compilation of Admin Variant: ${variant.id} ---`);
+        cleanMauiIntermediate();
+        buildMauiApp('Admin', variant.id, variant.targetFramework, variant.rid, variant.minOS);
+        packageMauiApp('Admin', variant.id, variant.suffix);
+      }
+    } else {
+      cleanMauiIntermediate();
+      buildMauiApp('Admin', 'Windows', 'net9.0-windows10.0.19041.0', 'win-x64', null);
+      packageMauiApp('Admin', 'Windows', null);
+    }
 
     // --- Step 2: Player Build ---
     console.log('\n=========================================');
@@ -247,8 +296,19 @@ Description: "Launch Interstitial-er ${mode}"; Filename: "{app}\\InterstitialerM
     console.log('=========================================\n');
     cleanViteBuild();
     compileViteAssets('Player');
-    buildMauiApp('Player');
-    packageMauiApp('Player');
+
+    if (isMac) {
+      for (const variant of macVariants) {
+        console.log(`\n--- Compilation of Player Variant: ${variant.id} ---`);
+        cleanMauiIntermediate();
+        buildMauiApp('Player', variant.id, variant.targetFramework, variant.rid, variant.minOS);
+        packageMauiApp('Player', variant.id, variant.suffix);
+      }
+    } else {
+      cleanMauiIntermediate();
+      buildMauiApp('Player', 'Windows', 'net9.0-windows10.0.19041.0', 'win-x64', null);
+      packageMauiApp('Player', 'Windows', null);
+    }
 
     console.log('\n=========================================');
     console.log(' MAUI BUILD COMPLETED SUCCESSFULLY ');
